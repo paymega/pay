@@ -1,0 +1,777 @@
+<!DOCTYPE html>
+<!-- saved from url=(0056)https://sukuna-mouse-content.samsungwendy84.workers.dev/ -->
+<html lang="en"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>HOTFLIX</title>
+<link rel="stylesheet" href="./index_files/all.min.css">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: #0a0a0a; color: #fff; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; min-height: 100%; overflow-x: hidden; }
+  a { color: inherit; text-decoration: none; }
+  img { display: block; max-width: 100%; }
+
+  /* HEADER */
+  header {
+    position: sticky; top: 0; z-index: 50;
+    background: rgba(10,10,10,0.95);
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid #222;
+    padding: 10px 14px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .logo { font-size: 20px; font-weight: 900; color: #E50914; cursor: pointer; }
+  .logo span { color: #fff; }
+  .header-actions { display: flex; gap: 12px; color: #888; font-size: 18px; }
+  @media (max-width: 640px) { .header-actions { display: none; } }
+
+  /* HERO */
+  .hero {
+    position: relative;
+    height: 40vh;
+    min-height: 220px;
+    background-size: cover;
+    background-position: center;
+    display: flex;
+    align-items: flex-end;
+    padding: 20px 14px;
+  }
+  .hero::after {
+    content: "";
+    position: absolute; inset: 0;
+    background: linear-gradient(180deg, rgba(10,10,10,0) 0%, rgba(10,10,10,0.7) 55%, #0a0a0a 100%);
+  }
+  .hero-inner { position: relative; z-index: 1; width: 100%; }
+  .hero h1 { font-size: clamp(24px, 5vw, 40px); font-weight: 900; }
+  .hero .price { color: #E50914; font-size: 18px; font-weight: 700; }
+  .hero p { color: #aaa; font-size: 13px; margin: 4px 0 10px; }
+  .hero .btn-group { display: flex; gap: 8px; flex-wrap: wrap; }
+
+  .btn {
+    border: 0; cursor: pointer; border-radius: 6px;
+    padding: 10px 18px; font-weight: 700; font-size: 13px;
+    display: inline-flex; align-items: center; gap: 6px;
+    transition: 0.2s; color: #fff;
+  }
+  .btn:active { transform: scale(0.95); }
+  .btn-red { background: #E50914; }
+  .btn-orange { background: #f97316; }
+  .btn-tg { background: #0088cc; }
+
+  /* TOP BAR */
+  .top-bar {
+    display: flex;
+    justify-content: flex-end;
+    padding: 14px 12px 4px;
+  }
+  .shuffle-btn {
+    background: #1e1e1e; color: #fff; border: 1px solid #333;
+    cursor: pointer; padding: 7px 14px; border-radius: 6px;
+    font-size: 12px; font-weight: 600;
+    display: flex; align-items: center; gap: 4px;
+  }
+  .shuffle-btn:active { transform: scale(0.95); }
+
+  /* GRID */
+  .grid {
+    display: grid;
+    gap: 12px;
+    padding: 10px 12px 30px;
+    grid-template-columns: 1fr;
+  }
+  @media (min-width: 640px) { .grid { grid-template-columns: 1fr 1fr; } }
+  @media (min-width: 769px) { .grid { grid-template-columns: repeat(4, 1fr); gap: 16px; padding: 10px 20px 40px; } }
+  @media (min-width: 1024px) { .grid { grid-template-columns: repeat(5, 1fr); } }
+
+  .card {
+    background: #141414;
+    border-radius: 10px;
+    overflow: hidden;
+    border: 1px solid #222;
+    transition: 0.2s;
+    cursor: pointer;
+  }
+  .card:hover { transform: translateY(-4px); border-color: #E50914; }
+
+  .poster {
+    position: relative;
+    aspect-ratio: 16/9;
+    background-size: cover;
+    background-position: center;
+    background-color: #0a0a0a;
+  }
+  .poster .fallback {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%; height: 100%;
+    background: #111;
+    color: #444;
+    font-size: 12px;
+  }
+  .overlay {
+    position: absolute; inset: 0;
+    background: rgba(0,0,0,0.3);
+    display: flex; align-items: center; justify-content: center;
+    opacity: 0;
+    transition: 0.3s;
+  }
+  .card:hover .overlay { opacity: 1; }
+  .play-btn {
+    width: 48px; height: 48px;
+    border-radius: 50%;
+    background: #E50914;
+    border: 0; color: #fff;
+    font-size: 18px;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+  }
+
+  .card-body { padding: 12px; }
+  .card-title { font-size: 15px; font-weight: 700; }
+  .card-price { font-size: 14px; color: #E50914; font-weight: 700; }
+  .card-actions { display: flex; gap: 6px; margin-top: 8px; }
+  .card-actions .btn { flex: 1; padding: 8px; font-size: 11px; border-radius: 6px; }
+
+  /* MODAL */
+  .modal {
+    position: fixed; inset: 0; z-index: 100;
+    background: rgba(0,0,0,0.94);
+    display: none; align-items: center; justify-content: center;
+    padding: 8px;
+  }
+  .modal.open { display: flex; }
+  .modal-box {
+    background: #141414;
+    border-radius: 10px;
+    overflow: hidden;
+    width: 100%; max-width: 800px;
+    border: 1px solid #222;
+  }
+  .modal-box video { width: 100%; aspect-ratio: 16/9; display: block; background: #000; }
+  .modal-header {
+    padding: 12px 16px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #222;
+  }
+  .modal-header h3 { font-size: 16px; font-weight: 700; }
+  .modal-header .close { background: none; border: 0; color: #888; font-size: 24px; cursor: pointer; }
+  .modal-header .close:hover { color: #fff; }
+  .modal-footer {
+    padding: 12px 16px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-top: 1px solid #222;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .modal-footer .price { font-size: 20px; font-weight: 800; color: #E50914; }
+  .modal-footer .btn { padding: 10px 20px; font-size: 14px; }
+
+  /* SALES POP */
+  .sales-pop-container {
+    position: fixed; bottom: 12px; left: 8px; z-index: 80;
+    display: flex; flex-direction: column; gap: 6px;
+    pointer-events: none;
+    max-width: calc(100vw - 16px);
+  }
+  .sales-pop {
+    background: rgba(20,20,20,0.95);
+    backdrop-filter: blur(12px);
+    border: 1px solid #222;
+    border-radius: 10px;
+    padding: 8px 12px;
+    display: flex; align-items: center; gap: 8px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.6);
+    animation: slideIn 0.4s ease forwards, fadeOut 0.4s ease 4.5s forwards;
+    pointer-events: auto;
+    max-width: 260px;
+  }
+  @keyframes slideIn { from { opacity: 0; transform: translateX(-30px); } to { opacity: 1; transform: translateX(0); } }
+  @keyframes fadeOut { from { opacity: 1; transform: translateX(0); } to { opacity: 0; transform: translateX(30px); } }
+  .sales-pop .avatar {
+    width: 32px; height: 32px;
+    border-radius: 50%;
+    background: #25D366;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 13px; font-weight: 700; color: #fff;
+    flex-shrink: 0;
+  }
+  .sales-pop .info { flex: 1; min-width: 0; }
+  .sales-pop .name { font-size: 11px; font-weight: 700; color: #fff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .sales-pop .action { font-size: 9px; color: #888; }
+  .sales-pop .movie { font-size: 10px; color: #E50914; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .sales-pop .time { font-size: 8px; color: #666; }
+  .sales-pop .badge { background: #25D366; color: #fff; font-size: 8px; font-weight: 800; padding: 2px 6px; border-radius: 3px; }
+
+  /* FOOTER */
+  footer {
+    padding: 20px 14px;
+    text-align: center;
+    color: #666;
+    font-size: 10px;
+    border-top: 1px solid #222;
+  }
+  .social { display: flex; justify-content: center; gap: 12px; margin-bottom: 8px; }
+  .social a {
+    width: 34px; height: 34px;
+    border-radius: 50%;
+    background: #1e1e1e;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 14px; color: #888;
+    transition: 0.2s;
+  }
+  .social a:hover { background: #E50914; color: #fff; }
+
+  @media (min-width: 769px) {
+    .logo { font-size: 26px; }
+    .hero { height: 55vh; min-height: 350px; padding: 40px 28px; }
+    .hero h1 { font-size: clamp(32px, 5vw, 52px); }
+    .hero .price { font-size: 22px; }
+    .hero p { font-size: 15px; }
+    .btn { padding: 12px 24px; font-size: 14px; }
+    .sales-pop-container { bottom: 20px; left: 20px; }
+    .sales-pop { max-width: 300px; padding: 10px 14px; }
+    footer { padding: 32px 20px; font-size: 13px; }
+  }
+</style>
+<style>@keyframes fadeIn { from { opacity:0; transform:translateY(12px); } to { opacity:1; transform:translateY(0); } }</style></head>
+<body style="">
+
+<!-- HEADER -->
+<header>
+  <div class="logo">HOT<span style="color:#fff;">FLIX</span></div> TELEGRAM STORE
+  <div class="header-actions">
+    <i class="fa-solid fa-search"></i>
+    <i class="fa-solid fa-shopping-cart"></i>
+  </div>
+</header>
+
+<!-- HERO -->
+<section class="hero" id="hero" style="background-image:url(&#39;imagens/imagem1.jpg&#39;)">
+  <div class="hero-inner">
+    <h1 id="heroTitle">ALL  CONTENT AND VIP CHANNEL</h1>
+    <div class="price" id="heroPrice">$175</div>
+    <p id="heroDesc">ALL CONTENTENT AND VIP CHANNEL 6TB.</p>
+    <div class="btn-group">
+      <button class="btn btn-orange" id="heroPreview"><i class="fa-solid fa-play"></i> Preview</button>
+      <button class="btn btn-red" id="heroBuy"><i class="fa-brands fa-telegram"></i> Buy</button>
+    </div>
+  </div>
+</section>  
+
+<!-- TOP BAR -->
+<div class="top-bar">
+  <button class="shuffle-btn" id="shuffleBtn"><i class="fa-solid fa-shuffle"></i> Shuffle</button>
+</div>
+
+<!-- GRID -->
+<div class="grid" id="grid">
+    <div class="card" data-id="17" style="animation:fadeIn 0.3s ease 0s forwards;opacity:0;">
+      <div class="poster" style="background-image:url(&#39;imagens/imagem17.jpg&#39;)">
+        
+        <div class="overlay">
+          <button class="play-btn" data-act="preview" data-id="17"><i class="fa-solid fa-play"></i></button>
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="card-title">BLACK GIRLS</div>
+        <div class="card-price">$35</div>
+        <div class="card-actions">
+          <button class="btn btn-orange" data-act="preview" data-id="17"><i class="fa-solid fa-play"></i> Preview</button>
+          <button class="btn btn-red" data-act="buy" data-id="17"><i class="fa-brands fa-telegram"></i> Buy</button>
+        </div>
+      </div>
+    </div>
+  
+    <div class="card" data-id="8" style="animation:fadeIn 0.3s ease 0.04s forwards;opacity:0;">
+      <div class="poster" style="background-image:url(&#39;imagens/imagem8.webp&#39;)">
+        
+        <div class="overlay">
+          <button class="play-btn" data-act="preview" data-id="8"><i class="fa-solid fa-play"></i></button>
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="card-title">NEW AMELIA BLONDE</div>
+        <div class="card-price">$35</div>
+        <div class="card-actions">
+          <button class="btn btn-orange" data-act="preview" data-id="8"><i class="fa-solid fa-play"></i> Preview</button>
+          <button class="btn btn-red" data-act="buy" data-id="8"><i class="fa-brands fa-telegram"></i> Buy</button>
+        </div>
+      </div>
+    </div>
+  
+    <div class="card" data-id="12" style="animation:fadeIn 0.3s ease 0.08s forwards;opacity:0;">
+      <div class="poster" style="background-image:url(&#39;imagens/imagem12.jpg&#39;)">
+        
+        <div class="overlay">
+          <button class="play-btn" data-act="preview" data-id="12"><i class="fa-solid fa-play"></i></button>
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="card-title">AYUMI TEEN</div>
+        <div class="card-price">$40</div>
+        <div class="card-actions">
+          <button class="btn btn-orange" data-act="preview" data-id="12"><i class="fa-solid fa-play"></i> Preview</button>
+          <button class="btn btn-red" data-act="buy" data-id="12"><i class="fa-brands fa-telegram"></i> Buy</button>
+        </div>
+      </div>
+    </div>
+  
+    <div class="card" data-id="11" style="animation:fadeIn 0.3s ease 0.12s forwards;opacity:0;">
+      <div class="poster" style="background-image:url(&#39;imagens/imagem11.png&#39;)">
+        
+        <div class="overlay">
+          <button class="play-btn" data-act="preview" data-id="11"><i class="fa-solid fa-play"></i></button>
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="card-title">FATHER AND DAUGTHER</div>
+        <div class="card-price">$40</div>
+        <div class="card-actions">
+          <button class="btn btn-orange" data-act="preview" data-id="11"><i class="fa-solid fa-play"></i> Preview</button>
+          <button class="btn btn-red" data-act="buy" data-id="11"><i class="fa-brands fa-telegram"></i> Buy</button>
+        </div>
+      </div>
+    </div>
+  
+    <div class="card" data-id="13" style="animation:fadeIn 0.3s ease 0.16s forwards;opacity:0;">
+      <div class="poster" style="background-image:url(&#39;imagens/imagem13.webp&#39;)">
+        
+        <div class="overlay">
+          <button class="play-btn" data-act="preview" data-id="13"><i class="fa-solid fa-play"></i></button>
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="card-title">BABY ASHLEE</div>
+        <div class="card-price">$30</div>
+        <div class="card-actions">
+          <button class="btn btn-orange" data-act="preview" data-id="13"><i class="fa-solid fa-play"></i> Preview</button>
+          <button class="btn btn-red" data-act="buy" data-id="13"><i class="fa-brands fa-telegram"></i> Buy</button>
+        </div>
+      </div>
+    </div>
+  
+    <div class="card" data-id="5" style="animation:fadeIn 0.3s ease 0.2s forwards;opacity:0;">
+      <div class="poster" style="background-image:url(&#39;imagens/imagem5.webp&#39;)">
+        
+        <div class="overlay">
+          <button class="play-btn" data-act="preview" data-id="5"><i class="fa-solid fa-play"></i></button>
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="card-title">CP 1-2</div>
+        <div class="card-price">$45</div>
+        <div class="card-actions">
+          <button class="btn btn-orange" data-act="preview" data-id="5"><i class="fa-solid fa-play"></i> Preview</button>
+          <button class="btn btn-red" data-act="buy" data-id="5"><i class="fa-brands fa-telegram"></i> Buy</button>
+        </div>
+      </div>
+    </div>
+  
+    <div class="card" data-id="1" style="animation:fadeIn 0.3s ease 0.24s forwards;opacity:0;">
+      <div class="poster" style="background-image:url(&#39;imagens/imagem1.jpg&#39;)">
+        
+        <div class="overlay">
+          <button class="play-btn" data-act="preview" data-id="1"><i class="fa-solid fa-play"></i></button>
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="card-title">ALL  CONTENT AND VIP CHANNEL</div>
+        <div class="card-price">$175</div>
+        <div class="card-actions">
+          <button class="btn btn-orange" data-act="preview" data-id="1"><i class="fa-solid fa-play"></i> Preview</button>
+          <button class="btn btn-red" data-act="buy" data-id="1"><i class="fa-brands fa-telegram"></i> Buy</button>
+        </div>
+      </div>
+    </div>
+  
+    <div class="card" data-id="7" style="animation:fadeIn 0.3s ease 0.28s forwards;opacity:0;">
+      <div class="poster" style="background-image:url(&#39;imagens/imagem7.jpg&#39;)">
+        
+        <div class="overlay">
+          <button class="play-btn" data-act="preview" data-id="7"><i class="fa-solid fa-play"></i></button>
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="card-title">PREMIUM CP</div>
+        <div class="card-price">$50</div>
+        <div class="card-actions">
+          <button class="btn btn-orange" data-act="preview" data-id="7"><i class="fa-solid fa-play"></i> Preview</button>
+          <button class="btn btn-red" data-act="buy" data-id="7"><i class="fa-brands fa-telegram"></i> Buy</button>
+        </div>
+      </div>
+    </div>
+  
+    <div class="card" data-id="15" style="animation:fadeIn 0.3s ease 0.32s forwards;opacity:0;">
+      <div class="poster" style="background-image:url(&#39;imagens/imagem15.jpg&#39;)">
+        
+        <div class="overlay">
+          <button class="play-btn" data-act="preview" data-id="15"><i class="fa-solid fa-play"></i></button>
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="card-title">BLOWJHOB TEENS</div>
+        <div class="card-price">$45</div>
+        <div class="card-actions">
+          <button class="btn btn-orange" data-act="preview" data-id="15"><i class="fa-solid fa-play"></i> Preview</button>
+          <button class="btn btn-red" data-act="buy" data-id="15"><i class="fa-brands fa-telegram"></i> Buy</button>
+        </div>
+      </div>
+    </div>
+  
+    <div class="card" data-id="14" style="animation:fadeIn 0.3s ease 0.36s forwards;opacity:0;">
+      <div class="poster" style="background-image:url(&#39;imagens/imagem14.jpg&#39;)">
+        
+        <div class="overlay">
+          <button class="play-btn" data-act="preview" data-id="14"><i class="fa-solid fa-play"></i></button>
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="card-title">13-17Y TEENS</div>
+        <div class="card-price">$35</div>
+        <div class="card-actions">
+          <button class="btn btn-orange" data-act="preview" data-id="14"><i class="fa-solid fa-play"></i> Preview</button>
+          <button class="btn btn-red" data-act="buy" data-id="14"><i class="fa-brands fa-telegram"></i> Buy</button>
+        </div>
+      </div>
+    </div>
+  
+    <div class="card" data-id="16" style="animation:fadeIn 0.3s ease 0.4s forwards;opacity:0;">
+      <div class="poster" style="background-image:url(&#39;imagens/imagem16.png&#39;)">
+        
+        <div class="overlay">
+          <button class="play-btn" data-act="preview" data-id="16"><i class="fa-solid fa-play"></i></button>
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="card-title">RAPE</div>
+        <div class="card-price">$50</div>
+        <div class="card-actions">
+          <button class="btn btn-orange" data-act="preview" data-id="16"><i class="fa-solid fa-play"></i> Preview</button>
+          <button class="btn btn-red" data-act="buy" data-id="16"><i class="fa-brands fa-telegram"></i> Buy</button>
+        </div>
+      </div>
+    </div>
+  
+    <div class="card" data-id="9" style="animation:fadeIn 0.3s ease 0.44s forwards;opacity:0;">
+      <div class="poster" style="background-image:url(&#39;imagens/imagem9.webp&#39;)">
+        
+        <div class="overlay">
+          <button class="play-btn" data-act="preview" data-id="9"><i class="fa-solid fa-play"></i></button>
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="card-title">DARKZADIE</div>
+        <div class="card-price">$30</div>
+        <div class="card-actions">
+          <button class="btn btn-orange" data-act="preview" data-id="9"><i class="fa-solid fa-play"></i> Preview</button>
+          <button class="btn btn-red" data-act="buy" data-id="9"><i class="fa-brands fa-telegram"></i> Buy</button>
+        </div>
+      </div>
+    </div>
+  
+    <div class="card" data-id="2" style="animation:fadeIn 0.3s ease 0.48s forwards;opacity:0;">
+      <div class="poster" style="background-image:url(&#39;imagens/imagem2.webp&#39;)">
+        
+        <div class="overlay">
+          <button class="play-btn" data-act="preview" data-id="2"><i class="fa-solid fa-play"></i></button>
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="card-title">MOM AND SON</div>
+        <div class="card-price">$35</div>
+        <div class="card-actions">
+          <button class="btn btn-orange" data-act="preview" data-id="2"><i class="fa-solid fa-play"></i> Preview</button>
+          <button class="btn btn-red" data-act="buy" data-id="2"><i class="fa-brands fa-telegram"></i> Buy</button>
+        </div>
+      </div>
+    </div>
+  
+    <div class="card" data-id="10" style="animation:fadeIn 0.3s ease 0.52s forwards;opacity:0;">
+      <div class="poster" style="background-image:url(&#39;imagens/imagem10.jpg&#39;)">
+        
+        <div class="overlay">
+          <button class="play-btn" data-act="preview" data-id="10"><i class="fa-solid fa-play"></i></button>
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="card-title">MEGA SEX CP</div>
+        <div class="card-price">$45</div>
+        <div class="card-actions">
+          <button class="btn btn-orange" data-act="preview" data-id="10"><i class="fa-solid fa-play"></i> Preview</button>
+          <button class="btn btn-red" data-act="buy" data-id="10"><i class="fa-brands fa-telegram"></i> Buy</button>
+        </div>
+      </div>
+    </div>
+  
+    <div class="card" data-id="3" style="animation:fadeIn 0.3s ease 0.56s forwards;opacity:0;">
+      <div class="poster" style="background-image:url(&#39;imagens/imagem3.webp&#39;)">
+        
+        <div class="overlay">
+          <button class="play-btn" data-act="preview" data-id="3"><i class="fa-solid fa-play"></i></button>
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="card-title">DESIREE GARCIA</div>
+        <div class="card-price">$25</div>
+        <div class="card-actions">
+          <button class="btn btn-orange" data-act="preview" data-id="3"><i class="fa-solid fa-play"></i> Preview</button>
+          <button class="btn btn-red" data-act="buy" data-id="3"><i class="fa-brands fa-telegram"></i> Buy</button>
+        </div>
+      </div>
+    </div>
+  
+    <div class="card" data-id="6" style="animation:fadeIn 0.3s ease 0.6s forwards;opacity:0;">
+      <div class="poster" style="background-image:url(&#39;imagens/imagem6.webp&#39;)">
+        
+        <div class="overlay">
+          <button class="play-btn" data-act="preview" data-id="6"><i class="fa-solid fa-play"></i></button>
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="card-title">IVANKA AND BRO</div>
+        <div class="card-price">$30</div>
+        <div class="card-actions">
+          <button class="btn btn-orange" data-act="preview" data-id="6"><i class="fa-solid fa-play"></i> Preview</button>
+          <button class="btn btn-red" data-act="buy" data-id="6"><i class="fa-brands fa-telegram"></i> Buy</button>
+        </div>
+      </div>
+    </div>
+  
+    <div class="card" data-id="4" style="animation:fadeIn 0.3s ease 0.64s forwards;opacity:0;">
+      <div class="poster" style="background-image:url(&#39;imagens/imagem4.webp&#39;)">
+        
+        <div class="overlay">
+          <button class="play-btn" data-act="preview" data-id="4"><i class="fa-solid fa-play"></i></button>
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="card-title">LIZZY AND BRO</div>
+        <div class="card-price">$35</div>
+        <div class="card-actions">
+          <button class="btn btn-orange" data-act="preview" data-id="4"><i class="fa-solid fa-play"></i> Preview</button>
+          <button class="btn btn-red" data-act="buy" data-id="4"><i class="fa-brands fa-telegram"></i> Buy</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+<!-- SALES POP -->
+<div class="sales-pop-container" id="salesPopContainer"><div class="sales-pop">
+    <div class="avatar">H</div>
+    <div class="info">
+      <div class="name">Harry C.</div>
+      <div class="action">got</div>
+      <div class="movie">🎬 PREMIUM CP</div>
+      <div class="time">1 min ago</div>
+    </div>
+    <div class="badge">✅</div>
+  </div></div>
+
+<!-- MODAL -->
+<div class="modal" id="modal">
+  <div class="modal-box">
+    <div class="modal-header">
+      <h3 id="modalTitle">ALL  CONTENT AND VIP CHANNEL</h3>
+      <button class="close" id="modalClose">×</button>
+    </div>
+    <video id="modalVideo" controls="" playsinline="" preload="metadata" src=""></video>
+    <div class="modal-footer">
+      <span class="price" id="modalPrice">$175</span>
+      <button class="btn btn-tg" id="modalBuy"><i class="fa-brands fa-telegram"></i> Buy on Telegram</button>
+    </div>
+  </div>
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <div class="social">
+    <a href="https://sukuna-mouse-content.samsungwendy84.workers.dev/#"><i class="fa-brands fa-instagram"></i></a>
+    <a href="https://sukuna-mouse-content.samsungwendy84.workers.dev/#"><i class="fa-brands fa-x-twitter"></i></a>
+    <a href="https://t.me/hot_taken" target="_blank"><i class="fa-brands fa-telegram"></i></a>
+  </div>
+  <div style="opacity:0.6;">© 2026 HOTFLIX — All rights reserved.</div>
+</footer>
+
+<script>
+
+
+const movies = [
+  { id: 1, title: "ALL  CONTENT AND VIP CHANNEL", price: 175, image: "imagens/imagem1.jpg", video: "videos/video1.mp4", desc: "ALL CONTENTENT AND VIP CHANNEL 6TB." },
+  { id: 2, title: "MOM AND SON", price: 35, image: "imagens/imagem2.webp", video: "videos/video2.mp4", desc: "PEDOM MOM." },
+  { id: 3, title: "DESIREE GARCIA", price: 25, image: "imagens/imagem3.webp", video: "videos/video3.mp4", desc: "BEST HOT CONTENT." },
+  { id: 4, title: "LIZZY AND BRO", price: 35, image: "imagens/imagem4.webp", video: "videos/video4.mp4", desc: "TEENS BLACKMAIL." },
+  { id: 5, title: "CP 1-2", price: 45, image: "imagens/imagem5.webp", video: "videos/video5.mp4", desc: "BEST HOT CONTENT 15GB IN CP." },
+  { id: 6, title: "IVANKA AND BRO", price: 30, image: "imagens/imagem6.webp", video: "videos/video6.mp4", desc: "BEST CONTENTENT." },
+  { id: 7, title: "PREMIUM CP", price: 50, image: "imagens/imagem7.jpg", video: "videos/video7.mp4", desc: "A team travels through a wormhole." },
+  { id: 8, title: "NEW AMELIA BLONDE", price: 35, image: "imagens/imagem8.webp", video: "videos/video8.mp4", desc: "All-in-one premium content mega pack." },
+  { id: 9, title: "DARKZADIE", price: 30, image: "imagens/imagem9.webp", video: "videos/video9.mp4", desc: "All-in-one premium content mega pack." },
+  { id: 10, title: "MEGA SEX CP", price: 45, image: "imagens/imagem10.jpg", video: "videos/video10.mp4", desc: "09-13Y." },
+  { id: 11, title: "FATHER AND DAUGTHER", price: 40, image: "imagens/imagem11.png", video: "videos/video11.mp4", desc: "PEDOM FATHER." },
+  { id: 12, title: "AYUMI TEEN", price: 40, image: "imagens/imagem12.jpg", video: "videos/video12.mp4", desc: "All-in-one premium content mega pack." },
+  { id: 13, title: "BABY ASHLEE", price: 30, image: "imagens/imagem13.webp", video: "videos/video13.mp4", desc: "All-in-one premium content mega pack." },
+  { id: 14, title: "13-17Y TEENS", price: 35, image: "imagens/imagem14.jpg", video: "videos/video14.mp4", desc: "All-in-one premium content mega pack." },
+  { id: 15, title: "BLOWJHOB TEENS", price: 45, image: "imagens/imagem15.jpg", video: "videos/video15.mp4", desc: "All-in-one premium content mega pack." },
+  { id: 16, title: "RAPE", price: 50, image: "imagens/imagem16.png", video: "videos/video16.mp4", desc: "All-in-one premium content mega pack." },
+  { id: 17, title: "BLACK GIRLS", price: 35, image: "imagens/imagem17.jpg", video: "videos/video17.mp4", desc: "All-in-one premium content mega pack." },
+];
+// ============================================================
+// ===== NÃO ALTERE NADA ABAIXO DESTA LINHA =====
+// ============================================================
+
+// ===== NOMES PARA AS BOLHAS =====
+const names = ["James W.","Emily R.","Michael T.","Sarah J.","David K.","Jessica M.","Daniel P.","Laura H.","Robert F.","Jennifer A.","William S.","Amanda C.","Joseph B.","Ashley D.","Thomas L.","Melissa G.","Charles N.","Stephanie V.","Mark O.","Nicole E.","Steven Z.","Rachel Q.","Kevin X.","Rebecca U.","Brian Y.","Kimberly I.","George W.","Angela P.","Edward R.","Michelle T.","Frank S.","Lisa M.","Harry C.","Sandra B.","Jack D.","Betty L.","Leo F.","Helen K.","Paul V.","Carol N."];
+const actions = ["purchased","bought","got","just ordered"];
+const times = ["just now","10 sec ago","30 sec ago","1 min ago","2 min ago","3 min ago","5 min ago"];
+const movieTitles = movies.map(m => m.title);
+function random(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
+
+// ===== SALES POP =====
+function createPop() {
+  const container = document.getElementById('salesPopContainer');
+  while (container.children.length >= 2) container.firstChild.remove();
+  if (movies.length === 0) return;
+  const name = random(names);
+  const initial = name.charAt(0);
+  const movie = random(movieTitles);
+  const action = random(actions);
+  const time = random(times);
+  const pop = document.createElement('div');
+  pop.className = 'sales-pop';
+  pop.innerHTML = `
+    <div class="avatar">${initial}</div>
+    <div class="info">
+      <div class="name">${name}</div>
+      <div class="action">${action}</div>
+      <div class="movie">🎬 ${movie}</div>
+      <div class="time">${time}</div>
+    </div>
+    <div class="badge">✅</div>
+  `;
+  container.appendChild(pop);
+  setTimeout(() => { if (pop.parentNode) pop.remove(); }, 5000);
+}
+setTimeout(createPop, 3000);
+setInterval(() => { setTimeout(createPop, Math.random() * 5000 + 3000); }, 6000);
+
+// ===== TELEGRAM =====
+const TG_USER = "hot_taken";
+function tgLink(m) {
+  const date = new Date().toLocaleString('en-GB');
+  const msg = `Hello, I would like to purchase this folder.\n\n🎬 Name: ${m.title}\n💰 Price: USD $${m.price}\n🕒 Date: ${date}\nPlease send me the payment instructions.\nPlease Fast!`;
+  return `https://t.me/${TG_USER}?text=${encodeURIComponent(msg)}`;
+}
+
+// ===== SHUFFLE =====
+function shuffleArray(arr) {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+// ===== RENDER =====
+const grid = document.getElementById('grid');
+let shuffled = shuffleArray(movies);
+
+function renderGrid() {
+  if (movies.length === 0) {
+    grid.innerHTML = `<div style="text-align:center;padding:40px;color:#666;grid-column:1/-1;">No products added. Edit the movies array in the code.</div>`;
+    return;
+  }
+  shuffled = shuffleArray(movies);
+  grid.innerHTML = shuffled.map((m, i) => `
+    <div class="card" data-id="${m.id}" style="animation:fadeIn 0.3s ease ${i*0.04}s forwards;opacity:0;">
+      <div class="poster" style="background-image:url('${m.image || ''}')">
+        ${!m.image ? `<div class="fallback"><i class="fa-solid fa-image"></i> No image</div>` : ''}
+        <div class="overlay">
+          <button class="play-btn" data-act="preview" data-id="${m.id}"><i class="fa-solid fa-play"></i></button>
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="card-title">${m.title}</div>
+        <div class="card-price">$${m.price}</div>
+        <div class="card-actions">
+          <button class="btn btn-orange" data-act="preview" data-id="${m.id}"><i class="fa-solid fa-play"></i> Preview</button>
+          <button class="btn btn-red" data-act="buy" data-id="${m.id}"><i class="fa-brands fa-telegram"></i> Buy</button>
+        </div>
+      </div>
+    </div>
+  `).join('');
+}
+
+// ===== HERO =====
+function updateHero() {
+  if (movies.length === 0) return;
+  const h = movies[0];
+  document.getElementById('hero').style.backgroundImage = `url('${h.image || 'imagens/imagem1.jpg'}')`;
+  document.getElementById('heroTitle').textContent = h.title;
+  document.getElementById('heroPrice').textContent = `$${h.price}`;
+  document.getElementById('heroDesc').textContent = h.desc || 'Exclusive premium content.';
+}
+updateHero();
+
+// ===== SHUFFLE BUTTON =====
+document.getElementById('shuffleBtn').addEventListener('click', () => {
+  renderGrid();
+  document.getElementById('grid').scrollIntoView({ behavior: 'smooth', block: 'start' });
+});
+
+// ===== GRID CLICKS =====
+grid.addEventListener('click', e => {
+  const btn = e.target.closest('[data-act]');
+  if (!btn) return;
+  e.stopPropagation();
+  const m = movies.find(movie => movie.id === +btn.dataset.id);
+  if (!m) return;
+  if (btn.dataset.act === 'preview') openModal(m);
+  else window.open(tgLink(m), '_blank');
+});
+
+// ===== MODAL =====
+const modal = document.getElementById('modal');
+const modalVideo = document.getElementById('modalVideo');
+let currentMovie = null;
+
+function openModal(m) {
+  currentMovie = m;
+  document.getElementById('modalTitle').textContent = m.title;
+  document.getElementById('modalPrice').textContent = `$${m.price}`;
+  modalVideo.src = m.video || '';
+  modalVideo.load();
+  modal.classList.add('open');
+  document.body.style.overflow = 'hidden';
+  if (m.video) modalVideo.play().catch(() => {});
+}
+function closeModal() {
+  modal.classList.remove('open');
+  modalVideo.pause();
+  modalVideo.src = '';
+  document.body.style.overflow = '';
+}
+document.getElementById('modalClose').onclick = closeModal;
+modal.addEventListener('click', e => { if (e.target === modal) closeModal(); });
+document.getElementById('modalBuy').onclick = () => window.open(tgLink(currentMovie), '_blank');
+document.addEventListener('keydown', e => { if (e.key === 'Escape' && modal.classList.contains('open')) closeModal(); });
+
+document.getElementById('heroPreview').onclick = () => { if (movies.length > 0) openModal(movies[0]); };
+document.getElementById('heroBuy').onclick = () => { if (movies.length > 0) window.open(tgLink(movies[0]), '_blank'); };
+
+// ===== INIT =====
+renderGrid();
+
+// ===== ANIMAÇÃO =====
+const style = document.createElement('style');
+style.textContent = `@keyframes fadeIn { from { opacity:0; transform:translateY(12px); } to { opacity:1; transform:translateY(0); } }`;
+document.head.appendChild(style);
+</script>
+
+</body></html>
